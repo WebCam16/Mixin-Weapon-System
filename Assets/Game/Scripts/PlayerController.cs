@@ -7,8 +7,6 @@ public class PlayerController : MonoBehaviour {
     public float rotateSpeed;
     public float speed;
 
-    public MixinBase fireWeapon;
-    public KeyCode fire1;
 
     // Update is called once per frame
     void Update()
@@ -16,14 +14,6 @@ public class PlayerController : MonoBehaviour {
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
         transform.Translate(Vector3.forward * verticalAxis * speed);
-        transform.Rotate(Vector3.up * rotateSpeed * horizontalAxis);
-
-        if (Input.GetKey(fire1))
-        {
-            if (fireWeapon.Check())
-            {
-                fireWeapon.Action();
-            }        
-        }                   
+        transform.Rotate(Vector3.up * rotateSpeed * horizontalAxis);                
     }
 }
