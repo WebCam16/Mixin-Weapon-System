@@ -6,7 +6,8 @@ using UnityEditor;
 using UnityEditorInternal;
 
 [CustomEditor(typeof(CallMixinActions))]
-public class CallActionMixinsInspector : Editor {
+public class CallActionMixinsInspector : Editor
+{
 
     CallMixinActions callMixinAction;
     ReorderableList mixinList;
@@ -16,7 +17,7 @@ public class CallActionMixinsInspector : Editor {
 
     void OnEnable()
     {
-        if(target == null)
+        if (target == null)
         {
             return;
         }
@@ -33,35 +34,61 @@ public class CallActionMixinsInspector : Editor {
             SerializedProperty element = mixinList.serializedProperty.GetArrayElementAtIndex(index);
 
             SerializedObject elementObj = new SerializedObject(element.objectReferenceValue);
+            elementObj.Update();
+            EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width - 80, lineHeight), elementObj.FindProperty("Name").stringValue);
+            EditorGUIUtility.labelWidth = 70;
+            EditorGUI.PropertyField(new Rect(rect.width - 80, rect.y, 80, lineHeight), elementObj.FindProperty("showMixin"));
+            EditorGUIUtility.labelWidth = 0;
+            elementObj.FindProperty("showInfo").boolValue = EditorGUI.Foldout(new Rect(rect.x, rect.y + lineHeightSpace, rect.width, lineHeight), elementObj.FindProperty("showInfo").boolValue, new GUIContent("Info"));
 
-            EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, lineHeight), elementObj.FindProperty("Name").stringValue);
-
-            SerializedProperty propertyIterator = elementObj.GetIterator();
-
-            int i = 1;
-            while(propertyIterator.NextVisible(true))
+            if (elementObj.FindProperty("showInfo").boolValue)
             {
-                EditorGUI.PropertyField(new Rect(rect.x, rect.y + (lineHeightSpace * i), rect.width, lineHeight), propertyIterator);
-                i++;
+                EditorGUI.ObjectField(new Rect(rect.x, rect.y + (lineHeightSpace * 2), rect.width, lineHeight), element, new GUIContent("Object"));
+
+                SerializedProperty propertyIterator = elementObj.GetIterator();
+
+                int i = 3;
+                bool showChildren = true;
+                while (propertyIterator.NextVisible(showChildren))
+                {
+                    EditorGUI.PropertyField(new Rect(rect.x, rect.y + (lineHeightSpace * i), rect.width, lineHeight), propertyIterator);
+                    i++;
+                    if (propertyIterator.isArray)
+                    {
+                        showChildren = propertyIterator.isExpanded;
+                    }
+
+                }
             }
+            elementObj.ApplyModifiedProperties();
+
         };
 
         mixinList.elementHeightCallback = (int index) =>
         {
+            int i = 2;
             float height = 0;
-
             SerializedProperty element = mixinList.serializedProperty.GetArrayElementAtIndex(index);
 
             SerializedObject elementObj = new SerializedObject(element.objectReferenceValue);
-
-            SerializedProperty propertyIterator = elementObj.GetIterator();
-
-            int i = 1;
-            while (propertyIterator.NextVisible(true))
+            if (elementObj.FindProperty("showInfo").boolValue)
             {
-                i++;
-            }
 
+                i++;
+                elementObj.Update();
+                SerializedProperty propertyIterator = elementObj.GetIterator();
+
+                
+                bool showChildren = true;
+                while (propertyIterator.NextVisible(showChildren))
+                {
+                    i++;
+                    if (propertyIterator.isArray)
+                    {
+                        showChildren = propertyIterator.isExpanded;
+                    }
+                }
+            }
             height = lineHeightSpace * i;
 
             return height;
@@ -75,6 +102,19 @@ public class CallActionMixinsInspector : Editor {
         DrawDefaultInspector();
 
         mixinList.DoLayoutList();
+
+        for(int i = 0; i <callMixinAction.actionsMixins.Count; i++)
+        {
+            if(!callMixinAction.actionsMixins[i].showMixin && callMixinAction.actionsMixins[i].hideFlags == HideFlags.None)
+            {
+                callMixinAction.actionsMixins[i].hideFlags = HideFlags.HideInInspector;
+            }
+            else if(callMixinAction.actionsMixins[i].showMixin && callMixinAction.actionsMixins[i].hideFlags == HideFlags.HideInInspector)
+            {
+                callMixinAction.actionsMixins[i].hideFlags = HideFlags.None;
+            }
+        }
+
     }
 
 }

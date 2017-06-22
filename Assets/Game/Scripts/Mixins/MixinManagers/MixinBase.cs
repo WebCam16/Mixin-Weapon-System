@@ -6,6 +6,10 @@ using UnityEngine;
 public class MixinBase : MonoBehaviour {
 
     public string Name;
+    [HideInInspector]
+    public bool showMixin;
+    [HideInInspector]
+    public bool showInfo;
 
 
     public virtual bool Check()
