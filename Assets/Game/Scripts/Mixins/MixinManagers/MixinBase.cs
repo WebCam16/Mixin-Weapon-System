@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class MixinBase : MonoBehaviour {
+
+    public string Name;
+
 
     public virtual bool Check()
     {
@@ -21,5 +25,4 @@ public class MixinBase : MonoBehaviour {
             Action();
         }
     }
-
 }

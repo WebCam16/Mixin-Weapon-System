@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class CallMixinActions : MixinBase {
 
     public List<MixinBase> checkMixins;

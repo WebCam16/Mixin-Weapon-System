@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class InputBase : MixinBase {
-    public KeyCode inputKey;
-    public MixinBase actionMixin;
 
+    public KeyCode inputKey;
+    public MixinBase inputAction;
 }

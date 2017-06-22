@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class GetKeyInput : InputBase {
 
-	void Update()
+    void Update()
     {
         if(Input.GetKey(inputKey))
         {
-            actionMixin.CheckAndAction();
+            inputAction.CheckAndAction();
         }
     }
 }
