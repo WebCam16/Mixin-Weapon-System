@@ -21,7 +21,6 @@ public class CheckClip : MixinActionable {
 
     public override void Action()
     {
-
         clip.incrementData(-ammoPerShot);
     }
 }

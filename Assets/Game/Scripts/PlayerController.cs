@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour {
     public float rotateSpeed;
     public float speed;
 
-    public CallMixinActions fireWeapon;
+    public MixinBase fireWeapon;
     public KeyCode fire1;
 
     // Update is called once per frame
@@ -18,9 +18,12 @@ public class PlayerController : MonoBehaviour {
         transform.Translate(Vector3.forward * verticalAxis * speed);
         transform.Rotate(Vector3.up * rotateSpeed * horizontalAxis);
 
-        if(Input.GetKey(fire1))
+        if (Input.GetKey(fire1))
         {
-            fireWeapon.CallActions();
-        }
+            if (fireWeapon.Check())
+            {
+                fireWeapon.Action();
+            }        
+        }                   
     }
 }
