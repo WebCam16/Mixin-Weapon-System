@@ -6,6 +6,7 @@ using UnityEngine;
 public class CallMixinActions : MixinBase {
 
     public List<MixinBase> checkMixins;
+    [HideInInspector]
     public List<MixinBase> actionsMixins;
 
     public override bool Check()

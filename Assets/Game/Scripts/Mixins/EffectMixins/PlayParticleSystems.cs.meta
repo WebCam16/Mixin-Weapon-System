@@ -1,5 +1,7 @@
 fileFormatVersion: 2
 guid: bc70f7c992c3b99468e9cc5283c4e210
+labels:
+- Mixin
 timeCreated: 1497660287
 licenseType: Free
 MonoImporter:

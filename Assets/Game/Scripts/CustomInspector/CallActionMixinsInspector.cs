@@ -4,6 +4,14 @@ using UnityEngine;
 
 using UnityEditor;
 using UnityEditorInternal;
+using System.IO;
+using System;
+
+[System.Serializable]
+public class AssetInfo
+{
+    public string assetPath;
+}
 
 [CustomEditor(typeof(CallMixinActions))]
 public class CallActionMixinsInspector : Editor
@@ -28,6 +36,11 @@ public class CallActionMixinsInspector : Editor
         callMixinAction = (CallMixinActions)target;
 
         mixinList = new ReorderableList(serializedObject, serializedObject.FindProperty("actionsMixins"), true, true, true, true);
+
+        mixinList.drawHeaderCallback = (Rect rect) =>
+        {
+            EditorGUI.LabelField(rect, new GUIContent("Action Mixins"));
+        };
 
         mixinList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
         {
@@ -94,6 +107,49 @@ public class CallActionMixinsInspector : Editor
             return height;
         };
 
+        mixinList.onAddDropdownCallback = (Rect rect, ReorderableList list) =>
+        {
+            GenericMenu dropdownMenu = new GenericMenu();
+            string[] mixinGUIDs = AssetDatabase.FindAssets("l:Mixin");
+
+            for(int i = 0; i < mixinGUIDs.Length; i++)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(mixinGUIDs[i]);
+                string menuPath = path.Replace("Assets/Game/Scripts/", "");
+
+                dropdownMenu.AddItem(new GUIContent(menuPath), false, AddItem, new AssetInfo { assetPath = path });
+            }
+
+            dropdownMenu.ShowAsContext();
+
+        };
+
+        mixinList.onRemoveCallback = (ReorderableList list) =>
+        {
+            int i = mixinList.index;
+            callMixinAction.actionsMixins[i].showMixin = true;
+            callMixinAction.actionsMixins[i].hideFlags = HideFlags.None;
+            callMixinAction.actionsMixins.RemoveAt(i);
+        };
+
+    }
+
+    public void AddItem(object obj)
+    {
+        AssetInfo assetInfo = (AssetInfo)obj;
+
+        string assetName = Path.GetFileNameWithoutExtension(assetInfo.assetPath);
+
+        Type assetType = Type.GetType(assetName + ", Assembly-CSharp");
+
+        MixinBase newMixin = (MixinBase)callMixinAction.gameObject.AddComponent(assetType);
+        newMixin.showInfo = true;
+        newMixin.Name = assetName;
+
+        int index = mixinList.serializedProperty.arraySize++;
+        mixinList.serializedProperty.GetArrayElementAtIndex(index).objectReferenceValue = newMixin;
+
+        serializedObject.ApplyModifiedProperties();
 
     }
 
